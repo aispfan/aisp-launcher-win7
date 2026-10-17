@@ -7,7 +7,8 @@ namespace aisp.launch;
 
 internal sealed class GitHubReleaseClient(HttpClient httpClient)
 {
-    private const string ZipAssetPattern = @"^aisp\.launch-.+-win-x86\.zip$";
+    // Accepts both "aisp.launch-<ver>-win-x86.zip" and "aisp.launch.win7-<ver>-win-x86.zip".
+    private const string ZipAssetPattern = @"^aisp\.launch(?:\.win7)?-.+-win-x86\.zip$";
     private static readonly Regex ZipAssetRegex = new(
         ZipAssetPattern,
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled
@@ -121,9 +122,16 @@ internal sealed class GitHubReleaseClient(HttpClient httpClient)
             throw new InvalidOperationException("Release has no tag name.");
 
         var tag = tagName.Trim();
-        const string prefix = "launcher-";
-        if (tag.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            tag = tag[prefix.Length..];
+        // Accepts "launcher-<ver>" and "launcher.win7-<ver>" tags.
+        string[] prefixes = ["launcher.win7-", "launcher-"];
+        foreach (var prefix in prefixes)
+        {
+            if (tag.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                tag = tag[prefix.Length..];
+                break;
+            }
+        }
 
         if (LaunchVersion.TryParse(tag) is null)
             throw new InvalidOperationException($"Unrecognized release tag '{tagName}'.");

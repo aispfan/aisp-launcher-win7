@@ -6,7 +6,7 @@ PROJECT="$ROOT/aisp.launch/aisp.launch.csproj"
 HOOK_BUILDER="$ROOT/scripts/build-hook.sh"
 WIN_PUBLISH_DIR="$ROOT/aisp.launch/bin/publish/win-x86"
 WEBSITE_URL="${AISP_WEBSITE_URL:-https://aisp.moe}"
-GITHUB_REPO="${AISP_GITHUB_REPO:-aisp-launcher-win7}"
+GITHUB_REPO="${AISP_GITHUB_REPO:-aispfan/aisp-launcher-win7}"
 
 dotnet publish "$PROJECT" -c Release \
     -p:PublishProfile="win-x86" \

@@ -6,7 +6,7 @@ namespace aisp.launch;
 
 internal static partial class ElectronRuntime
 {
-    public const string Version = "44.1.1";
+    public const string Version = "22.3.27";
 
     private const string EmbeddedMainJs = "aisp.electron.app.main.js";
     private const string EmbeddedPackageJson = "aisp.electron.app.package.json";

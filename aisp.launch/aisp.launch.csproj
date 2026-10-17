@@ -7,10 +7,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>aisp.launch</AssemblyName>
-    <InformationalVersion Condition="'$(InformationalVersion)' == ''">dev</InformationalVersion>
+    <InformationalVersion Condition="'$(InformationalVersion)' == ''">win7</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <DefaultWebsiteUrl Condition="'$(DefaultWebsiteUrl)' == ''">https://aisp.moe</DefaultWebsiteUrl>
-    <DefaultGitHubRepo Condition="'$(DefaultGitHubRepo)' == ''">Tricon2-Elf/aisp-launcher</DefaultGitHubRepo>
+    <DefaultGitHubRepo Condition="'$(DefaultGitHubRepo)' == ''">aispfan/aisp-launcher-win7</DefaultGitHubRepo>
   </PropertyGroup>
 
   <ItemGroup>

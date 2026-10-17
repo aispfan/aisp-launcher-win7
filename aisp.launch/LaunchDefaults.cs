@@ -8,7 +8,7 @@ internal static class LaunchDefaults
         ReadMetadata("DefaultWebsiteUrl", "https://aisp.moe");
 
     public static string GitHubRepo { get; } =
-        ReadMetadata("DefaultGitHubRepo", "Tricon2-Elf/aisp-launcher");
+        ReadMetadata("DefaultGitHubRepo", "aispfan/aisp-launcher-win7");
 
     private static string ReadMetadata(string key, string fallback) =>
         Assembly

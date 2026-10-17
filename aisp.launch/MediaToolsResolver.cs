@@ -10,16 +10,36 @@ internal readonly record struct MediaTools(string Streamlink, string Ffmpeg);
 internal static class MediaToolsResolver
 {
     private const string WindowsReleaseApi =
-        "https://api.github.com/repos/streamlink/windows-builds/releases/latest";
+        "https://api.github.com/repos/streamlink/windows-builds/releases/tags/6.11.0-1";
     private const string LinuxReleaseApi =
         "https://api.github.com/repos/streamlink/streamlink-appimage/releases/latest";
     private const string YtdlpReleaseApi =
-        "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest";
+        "https://api.github.com/repos/yt-dlp/yt-dlp/releases/tags/2024.10.22";
 
     private static readonly Regex Sha256DigestRegex = new(
         @"^sha256:([0-9a-fA-F]{64})$",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled
     );
+
+    // Releases published before GitHub added asset digests (mid-2025) report "digest": null.
+    // For those pinned releases we verify against these known SHA256 values instead.
+    private static readonly Dictionary<string, string> PinnedSha256 = new(StringComparer.Ordinal)
+    {
+        // streamlink/windows-builds 6.11.0-1
+        ["streamlink-6.11.0-1-py38-x86_64.zip"] =
+            "41c4a5388a5762dc8beebbc78f812b1ac6d4aaaa160ad0d9d990ffa86879fd49",
+        // yt-dlp 2024.10.22 (matches the release's SHA2-256SUMS)
+        ["yt-dlp.exe"] =
+            "427f257578b99227e5364a0712bee649cab849be43e4916fe23a136305fd0151",
+    };
+
+    private static string? ResolveSha256(string assetName, string? digest)
+    {
+        if (digest is not null && Sha256DigestRegex.Match(digest) is { Success: true } match)
+            return match.Groups[1].Value.ToLowerInvariant();
+
+        return PinnedSha256.TryGetValue(assetName, out var pinned) ? pinned.ToLowerInvariant() : null;
+    }
 
     public static MediaTools? TryFindExisting()
     {
@@ -268,6 +288,7 @@ internal static class MediaToolsResolver
                 $"yt-dlp release {release.TagName} has no {wanted} asset."
             );
 
+        var sha256 = ResolveSha256(asset.Name, asset.Digest);
         if (
             string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl)
             || !asset.BrowserDownloadUrl.StartsWith(
@@ -275,8 +296,7 @@ internal static class MediaToolsResolver
                 StringComparison.Ordinal
             )
             || asset.Size <= 0
-            || asset.Digest is null
-            || Sha256DigestRegex.Match(asset.Digest) is not { Success: true } digestMatch
+            || sha256 is null
         )
         {
             throw new InvalidOperationException("Selected yt-dlp release asset is invalid.");
@@ -287,7 +307,7 @@ internal static class MediaToolsResolver
             asset.BrowserDownloadUrl,
             asset.Size,
             release.TagName,
-            digestMatch.Groups[1].Value.ToLowerInvariant()
+            sha256
         );
     }
 
@@ -354,7 +374,7 @@ internal static class MediaToolsResolver
         {
             if (platform.IsWindows)
             {
-                if (candidate.Name.EndsWith("-x86_64.zip", StringComparison.OrdinalIgnoreCase))
+                if (candidate.Name.EndsWith("-py38-x86_64.zip", StringComparison.OrdinalIgnoreCase))
                     matches.Add(candidate);
             }
             else
@@ -378,6 +398,7 @@ internal static class MediaToolsResolver
         }
 
         var asset = matches[0];
+        var sha256 = ResolveSha256(asset.Name, asset.Digest);
         if (
             string.IsNullOrWhiteSpace(asset.BrowserDownloadUrl)
             || !asset.BrowserDownloadUrl.StartsWith(
@@ -385,8 +406,7 @@ internal static class MediaToolsResolver
                 StringComparison.Ordinal
             )
             || asset.Size <= 0
-            || asset.Digest is null
-            || Sha256DigestRegex.Match(asset.Digest) is not { Success: true } digestMatch
+            || sha256 is null
         )
         {
             throw new InvalidOperationException("Selected Streamlink release asset is invalid.");
@@ -397,7 +417,7 @@ internal static class MediaToolsResolver
             asset.BrowserDownloadUrl,
             asset.Size,
             release.TagName,
-            digestMatch.Groups[1].Value.ToLowerInvariant()
+            sha256
         );
     }
 

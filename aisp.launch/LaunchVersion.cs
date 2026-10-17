@@ -9,7 +9,7 @@ internal static class LaunchVersion
             .GetExecutingAssembly()
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion
-        ?? "dev";
+        ?? "win7";
 
     public static string WindowTitle => $"aisp.launch - {Display}";
 
@@ -22,7 +22,7 @@ internal static class LaunchVersion
             return null;
 
         var trimmed = version.Trim();
-        if (trimmed.Equals("dev", StringComparison.OrdinalIgnoreCase))
+        if (trimmed.Equals("win7", StringComparison.OrdinalIgnoreCase))
             return null;
 
         return Version.TryParse(trimmed, out var parsed) ? parsed : null;

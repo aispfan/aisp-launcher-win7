@@ -10,7 +10,7 @@ on:
       github_repo:
         description: GitHub owner/repo for launcher updates
         type: string
-        default: Tricon2-Elf/aisp-launcher
+        default: aispfan/aisp-launcher-win7
 
 concurrency:
   group: launcher-release
